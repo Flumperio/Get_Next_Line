@@ -6,7 +6,7 @@
 /*   By: juasanto <juasanto@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/25 09:24:04 by juasanto          #+#    #+#             */
-/*   Updated: 2020/10/05 13:51:07 by juasanto         ###   ########.fr       */
+/*   Updated: 2020/10/07 12:02:43 by juasanto         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,15 +86,17 @@ char	*ft_strchr(const char *string, int chr)
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
-	char	*string;
-	size_t	count;
+	char			*string;
+	size_t			count;
+	unsigned int	ft_len;
 
 	count = 0;
 	if (s == NULL)
 		return (NULL);
 	if ((string = (char *)malloc(sizeof(*s) * (len + 1))) == 0)
 		return (NULL);
-	while (count < len && start < (unsigned int)(ft_strlen(s)))
+	ft_len = (unsigned int)(ft_strlen(s));
+	while (count < len && start < ft_len)
 	{
 		string[count] = s[count + start];
 		count++;
