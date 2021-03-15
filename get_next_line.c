@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: juasanto <juasanto@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcsantos <jcsantos@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/05 13:44:19 by juasanto          #+#    #+#             */
-/*   Updated: 2020/10/05 14:08:40 by juasanto         ###   ########.fr       */
+/*   Updated: 2021/03/15 16:59:39 by jcsantos         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	ft_strdel(char **string)
 	}
 }
 
-int		ft_add(char **read_fd, int fd, char **line)
+int	ft_add(char **read_fd, int fd, char **line)
 {
 	int		count;
 	char	*tmp1;
@@ -36,7 +36,7 @@ int		ft_add(char **read_fd, int fd, char **line)
 	return (1);
 }
 
-int		fn_return(char **line, int fd, char **read_fd, ssize_t bytes_read)
+int	fn_return(char **line, int fd, char **read_fd, ssize_t bytes_read)
 {
 	if (bytes_read < 0)
 		return (-1);
@@ -56,30 +56,38 @@ int		fn_return(char **line, int fd, char **read_fd, ssize_t bytes_read)
 	}
 }
 
-int		get_next_line(int fd, char **line)
+void	read_buffer(char *buffer, int bytes_read, char **read_fd, int fd)
+{
+	char	*tmp;
+
+	tmp = NULL;
+	buffer[bytes_read] = '\0';
+	if (read_fd[fd] == NULL)
+		read_fd[fd] = ft_strdup(buffer);
+	else
+	{
+		tmp = ft_strjoin(read_fd[fd], buffer);
+		free(read_fd[fd]);
+		read_fd[fd] = tmp;
+	}
+}
+
+int	get_next_line(int fd, char **line)
 {
 	char		*buffer;
 	ssize_t		bytes_read;
 	static char	*read_fd[4096];
-	char		*tmp;
 
-	bytes_read = 0;
-	if (fd < 0 || line == 0 || BUFFER_SIZE < 1 || \
-		(!(buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1)))))
+	buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (fd < 0 || line == 0 || BUFFER_SIZE < 1 || (!buffer))
 		return (-1);
-	while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0)
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	while (bytes_read > 0)
 	{
-		buffer[bytes_read] = '\0';
-		if (read_fd[fd] == NULL)
-			read_fd[fd] = ft_strdup(buffer);
-		else
-		{
-			tmp = ft_strjoin(read_fd[fd], buffer);
-			free(read_fd[fd]);
-			read_fd[fd] = tmp;
-		}
+		read_buffer(buffer, bytes_read, read_fd, fd);
 		if (ft_strchr(read_fd[fd], '\n') != 0)
 			break ;
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
 	}
 	free(buffer);
 	return (fn_return(line, fd, read_fd, bytes_read));
